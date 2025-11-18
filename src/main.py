@@ -1,5 +1,7 @@
 import xml.etree.ElementTree as ET
 from dataclasses import dataclass, field
+from collections import deque # [NEW] Cần cho BFS
+import os
 
 @dataclass
 class PetriNet:
@@ -44,11 +46,59 @@ class PetriNet:
 
     def is_enabled(self, trans_id: str, current_marking: set[str]) -> bool:
         preset = self.get_preset(trans_id)
-
         if not preset:
             return True
-
         return preset.issubset(current_marking)
+
+    # --- [TASK 2] Thêm hàm Fire Transition ---
+    def fire_transition(self, trans_id: str, current_marking: set[str]) -> set[str]:
+        """
+        Kích hoạt transition và trả về marking mới.
+        Công thức: M' = (M \ Preset) U Postset
+        """
+        if not self.is_enabled(trans_id, current_marking):
+            raise ValueError(f"Transition {trans_id} is not enabled!")
+            
+        preset = self.get_preset(trans_id)
+        postset = self.get_postset(trans_id)
+        
+        # Logic cho 1-safe
+        new_marking = current_marking.difference(preset).union(postset)
+        return new_marking
+
+# --- [TASK 2] Hàm BFS để tìm Reachable Markings ---
+def get_reachable_markings_bfs(net: PetriNet):
+    print("--- Starting BFS Reachability Analysis ---")
+    
+    # Frozenset để lưu được vào set visited (vì set thường không hashable)
+    initial_m = frozenset(net.initial_marking)
+    
+    visited = set()
+    queue = deque()
+    
+    visited.add(initial_m)
+    queue.append(initial_m)
+    
+    edges = [] # Lưu cạnh đồ thị (Source -> Transition -> Target) để debug/vẽ
+    
+    while queue:
+        current_m_frozen = queue.popleft()
+        current_m = set(current_m_frozen)
+        
+        for t in net.transitions:
+            if net.is_enabled(t, current_m):
+                next_m = net.fire_transition(t, current_m)
+                next_m_frozen = frozenset(next_m)
+                
+                # Lưu lại cạnh chuyển đổi
+                edges.append((set(current_m_frozen), t, next_m))
+                
+                if next_m_frozen not in visited:
+                    visited.add(next_m_frozen)
+                    queue.append(next_m_frozen)
+                    
+    print(f"BFS Completed. Found {len(visited)} reachable markings.")
+    return list(visited), edges
 
 def verify_consistency(places: set, transitions: set, all_arc_tuples: list):
     all_nodes = places.union(transitions)
@@ -59,15 +109,15 @@ def verify_consistency(places: set, transitions: set, all_arc_tuples: list):
         if tgt not in all_nodes:
             raise ValueError(f"Consistency Error: Target node '{tgt}' in arc does not exist.")
 
-        if src in places and tgt in places:
-            raise ValueError(f"Consistency Error: Invalid P->P arc ({src} -> {tgt}).")
-        if src in transitions and tgt in transitions:
-            raise ValueError(f"Consistency Error: Invalid T->T arc ({src} -> {tgt}).")
-
     print("Consistency check: OK.")
 
 def parse_pnml(pnml_file: str) -> PetriNet | None:
     print(f"Parsing file: {pnml_file}...")
+    
+    # Kiểm tra file tồn tại
+    if not os.path.exists(pnml_file):
+        print(f"Error: File not found at {os.path.abspath(pnml_file)}")
+        return None
 
     places = set()
     transitions = set()
@@ -80,28 +130,43 @@ def parse_pnml(pnml_file: str) -> PetriNet | None:
         tree = ET.parse(pnml_file)
         root = tree.getroot()
 
-        namespace = root.tag.split('}')[0].strip('{')
-        ns_map = {'pnml': namespace}
+        # Xử lý Namespace
+        namespace = ''
+        if '}' in root.tag:
+            namespace = root.tag.split('}')[0].strip('{')
+        ns_map = {'pnml': namespace} if namespace else {}
 
-        for place in root.findall('.//pnml:place', ns_map):
+        # Helper function để tìm với namespace
+        def find_all(elem, path):
+            if namespace:
+                # Thêm prefix pnml: vào mỗi tag trong path
+                parts = path.split('/')
+                new_parts = [f"pnml:{p}" if p and p != '.' else p for p in parts]
+                return elem.findall('/'.join(new_parts), ns_map)
+            else:
+                return elem.findall(path)
+
+        # Parse Places
+        for place in find_all(root, './/place'):
             place_id = place.get('id')
             if place_id:
                 places.add(place_id)
-
-                marking_node = place.find('.//pnml:initialMarking/pnml:text', ns_map)
-                if marking_node is not None:
-                    try:
+                # Tìm initialMarking
+                marking_node = place.find(f".//{'pnml:' if namespace else ''}initialMarking/{'pnml:' if namespace else ''}text", ns_map)
+                if marking_node is not None and marking_node.text:
+                     try:
                         if int(marking_node.text) > 0:
                             initial_marking.add(place_id)
-                    except (ValueError, TypeError):
-                        pass
+                     except: pass
 
-        for trans in root.findall('.//pnml:transition', ns_map):
+        # Parse Transitions
+        for trans in find_all(root, './/transition'):
             trans_id = trans.get('id')
             if trans_id:
                 transitions.add(trans_id)
 
-        for arc in root.findall('.//pnml:arc', ns_map):
+        # Parse Arcs
+        for arc in find_all(root, './/arc'):
             src = arc.get('source')
             tgt = arc.get('target')
             if src and tgt:
@@ -115,30 +180,28 @@ def parse_pnml(pnml_file: str) -> PetriNet | None:
             elif src in transitions and tgt in places:
                 arcs_tp.add((src, tgt))
 
-        net = PetriNet(
-            places=places,
-            transitions=transitions,
-            arcs_pt=arcs_pt,
-            arcs_tp=arcs_tp,
-            initial_marking=initial_marking
-        )
-        return net
+        return PetriNet(places, transitions, arcs_pt, arcs_tp, initial_marking)
 
-    except ET.ParseError as e:
-        print(f"XML Parse Error: {e}")
-    except FileNotFoundError:
-        print(f"Error: File not found '{pnml_file}'")
-    except ValueError as e:
-        print(f"Data Error: {e}")
     except Exception as e:
-        print(f"An unknown error occurred: {e}")
-
-    return None
+        print(f"Error parsing PNML: {e}")
+        return None
 
 if __name__ == "__main__":
-    # my_petri_net = parse_pnml('petri_net.pnml')
-    my_petri_net = parse_pnml('tests/petri_net.pnml')
+    # Đường dẫn file: giả định chạy từ thư mục gốc (nơi chứa folder src và tests)
+    input_file = os.path.join("tests", "petri_net.pnml")
+    
+    my_petri_net = parse_pnml(input_file)
 
     if my_petri_net:
         print("\n--- PNML Parsing Successful! ---")
-        print(my_petri_net)
+        
+        # --- CHẠY TASK 2 ---
+        reachable_markings, graph_edges = get_reachable_markings_bfs(my_petri_net)
+        
+        print("\n--- Reachable Markings (Explicit) ---")
+        for idx, m in enumerate(reachable_markings):
+            print(f"M{idx}: {set(m)}")
+            
+        print("\n--- Reachability Graph Edges ---")
+        for (src, t, tgt) in graph_edges:
+            print(f"{src} --[{t}]--> {tgt}")
