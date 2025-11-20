@@ -2,7 +2,7 @@ import xml.etree.ElementTree as ET
 from dataclasses import dataclass, field
 from collections import deque
 import os
-
+from src.task_3_symbolic import symbolic_reachability
 @dataclass
 class PetriNet:
     places: set[str] = field(default_factory=set)
