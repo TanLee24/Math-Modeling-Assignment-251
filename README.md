@@ -14,7 +14,7 @@ The project is written in **Python ≥ 3.10** and designed to run on **Ubuntu / 
 
 ---
 
-## 🔧 1. System Requirements
+## 🔧 System Requirements
 
 Make sure your system has:
 - Python 3.10+
@@ -25,3 +25,11 @@ Check Python version:
 
 ```bash
 python3 --version
+```
+
+# Install Dependencies (Ubuntu)
+## Update package index
+
+```sh
+sudo apt update
+```
