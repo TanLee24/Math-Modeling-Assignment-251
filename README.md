@@ -1,3 +1,5 @@
+# Math-Modeling-Assignment-251
+Symbolic and Algebraic Reasoning in Petri Nets
 # 📘 Petri Net Analyzer – Installation & Usage Guide (Ubuntu)
 
 This project implements:
