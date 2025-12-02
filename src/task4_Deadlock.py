@@ -92,7 +92,6 @@ def candidate_from_ILP(model, x):
 
 # BDD checking reachables
 def is_reachable(candidate, pn: PetriNet, bdd: BinaryDecisionDiagram):
-    # BDD dùng biến p0, p1, p2... => lấy chỉ số từ tên biến
     assign = {}
     for var in bdd.support:
         name = var.name      # vd: "p3"

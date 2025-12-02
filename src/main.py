@@ -10,7 +10,7 @@ import numpy as np
 
 def main():
     # ------------------------------------------------------
-    # 1. Load Petri Net từ file PNML
+    # 1. Load Petri Net from PNML file
     # ------------------------------------------------------
     filename = "tests/test.pnml"
     print("Loading PNML:", filename)
