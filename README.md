@@ -27,6 +27,8 @@ Check Python version:
 python3 --version
 ```
 
+---
+
 # Install Dependencies (Ubuntu)
 ## Update package index
 
@@ -40,9 +42,25 @@ sudo apt update
 | **pyeda**               | BDD symbolic model checking   |
 | **pulp**                | Linear programming solver     |
 | **numpy**               | Matrix & marking operations   |
-| **graphviz** (optional) | Visualization of BDD diagrams |
 
 Install them using pip:
 ```sh
 pip3 install pyeda pulp numpy
 ```
+
+---
+
+# How to Run the Program
+Run the program:
+```sh
+python3 -m src.main
+```
+
+---
+
+# Example Program Output
+--- BFS Reachable Markings ---
+[1 0 0 0 0]
+[0 1 0 0 0]
+...
+Total BFS reachable = 5
