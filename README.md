@@ -60,7 +60,11 @@ python3 -m src.main
 
 # Example Program Output
 --- BFS Reachable Markings ---
+
 [1 0 0 0 0]
+
 [0 1 0 0 0]
+
 ...
+
 Total BFS reachable = 5
