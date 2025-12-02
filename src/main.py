@@ -1,170 +1,74 @@
-import xml.etree.ElementTree as ET
-from dataclasses import dataclass, field
-from collections import deque
-import os
-from src.task_3_symbolic import symbolic_reachability
-@dataclass
-class PetriNet:
-    places: set[str] = field(default_factory=set)
-    transitions: set[str] = field(default_factory=set)
-    arcs_pt: set[tuple[str, str]] = field(default_factory=set)
-    arcs_tp: set[tuple[str, str]] = field(default_factory=set)
-    initial_marking: set[str] = field(default_factory=set)
+from .task1_PetriNet import PetriNet
+from .task2_BFS import bfs_reachable
+from .task2_DFS import dfs_reachable
+from .task3_BDD import bdd_reachable
+from .task4_Deadlock import deadlock_reachable_marking
+from .task5_Optimization import max_reachable_marking
+from pyeda.inter import *
+import pulp
+import numpy as np
 
-    def __str__(self):
-        return (
-            f"--- Petri Net ---\n"
-            f"Places: {self.places}\n"
-            f"Transitions: {self.transitions}\n"
-            f"Initial Marking (1-safe): {self.initial_marking}\n"
-            f"-----------------"
-        )
+def main():
+    # ------------------------------------------------------
+    # 1. Load Petri Net từ file PNML
+    # ------------------------------------------------------
+    filename = "tests/test.pnml"
+    print("Loading PNML:", filename)
 
-    def get_preset(self, trans_id: str) -> set[str]:
-        if trans_id not in self.transitions:
-            raise ValueError(f"Transition '{trans_id}' does not exist.")
-        preset_places = set()
-        for (place, transition) in self.arcs_pt:
-            if transition == trans_id:
-                preset_places.add(place)
-        return preset_places
+    pn = PetriNet.from_pnml(filename)
+    print("\n--- Petri Net Loaded ---")
+    print(pn)
 
-    def get_postset(self, trans_id: str) -> set[str]:
-        if trans_id not in self.transitions:
-            raise ValueError(f"Transition '{trans_id}' does not exist.")
-        postset_places = set()
-        for (transition, place) in self.arcs_tp:
-            if transition == trans_id:
-                postset_places.add(place)
-        return postset_places
+    # ------------------------------------------------------
+    # 2. BFS reachable
+    # ------------------------------------------------------
+    print("\n--- BFS Reachable Markings ---")
+    bfs_set = bfs_reachable(pn)
+    for m in bfs_set:
+        print(np.array(m))
+    print("Total BFS reachable =", len(bfs_set))
 
-    def is_enabled(self, trans_id: str, current_marking: set[str]) -> bool:
-        preset = self.get_preset(trans_id)
-        if not preset:
-            return True
-        return preset.issubset(current_marking)
+    # ------------------------------------------------------
+    # 3. DFS reachable
+    # ------------------------------------------------------
+    print("\n--- DFS Reachable Markings ---")
+    dfs_set = dfs_reachable(pn)
+    for m in dfs_set:
+        print(np.array(m))
+    print("Total DFS reachable =", len(dfs_set))
 
-    def fire_transition(self, trans_id: str, current_marking: set[str]) -> set[str]:
-        if not self.is_enabled(trans_id, current_marking):
-            raise ValueError(f"Transition {trans_id} is not enabled!")
-            
-        preset = self.get_preset(trans_id)
-        postset = self.get_postset(trans_id)
-        
-        # Logic cho 1-safe
-        new_marking = current_marking.difference(preset).union(postset)
-        return new_marking
+    # ------------------------------------------------------
+    # 4. BDD reachable
+    # ------------------------------------------------------
+    print("\n--- BDD Reachable ---")
+    bdd, count = bdd_reachable(pn)
+    print("Satisfying all:", list(bdd.satisfy_all()))
+    print("Minimized =", espresso_exprs(bdd2expr(bdd)))
+    print("BDD reachable markings =", count)
+    ## Source(bdd.to_dot()).render("bdd", format="png", cleanup=True)
 
-def get_reachable_markings_bfs(net: PetriNet):
-    """
-    Thuật toán BFS tìm kiếm không gian trạng thái (Task 2).
-    Trả về: (Danh sách các marking, Danh sách các cạnh đồ thị)
-    """
-    print("--- Starting BFS Reachability Analysis ---")
-    
-    initial_m = frozenset(net.initial_marking)
-    visited = set()
-    queue = deque()
-    
-    visited.add(initial_m)
-    queue.append(initial_m)
-    
-    edges = [] 
-    
-    while queue:
-        current_m_frozen = queue.popleft()
-        current_m = set(current_m_frozen)
-        
-        for t in net.transitions:
-            if net.is_enabled(t, current_m):
-                next_m = net.fire_transition(t, current_m)
-                next_m_frozen = frozenset(next_m)
-                
-                edges.append((set(current_m_frozen), t, next_m))
-                
-                if next_m_frozen not in visited:
-                    visited.add(next_m_frozen)
-                    queue.append(next_m_frozen)
-                    
-    print(f"BFS Completed. Found {len(visited)} reachable markings.")
-    return list(visited), edges
+    # ------------------------------------------------------
+    # 5. Deadlock detection
+    # ------------------------------------------------------
+    print("\n--- Deadlock reachable marking ---")
+    dead = deadlock_reachable_marking(pn, bdd)
+    if dead is not None:
+        print("Deadlock marking:", dead)
+    else:
+        print("No deadlock reachable.")
 
-def verify_consistency(places: set, transitions: set, all_arc_tuples: list):
-    all_nodes = places.union(transitions)
-    for (src, tgt) in all_arc_tuples:
-        if src not in all_nodes:
-            raise ValueError(f"Consistency Error: Node '{src}' or '{tgt}' in arc does not exist.")
-    # print("Consistency check: OK.")
+    # ------------------------------------------------------
+    # 6. Optimization: maximize c·M
+    # ------------------------------------------------------
+    c = np.array([1, -2, 3, -1, 1, 2])
+    print("\n--- Optimize c·M ---")
+    max_mark, max_val = max_reachable_marking(
+        pn.place_names, bdd, c
+    )
+    print("c:", c)
+    print("Max marking:", max_mark)
+    print("Max value:", max_val)
 
-def parse_pnml(pnml_file: str) -> PetriNet | None:
-    """
-    Đọc file PNML và trả về đối tượng PetriNet (Task 1).
-    """
-    print(f"Parsing file: {pnml_file}...")
-    if not os.path.exists(pnml_file):
-        print(f"Error: File not found at {os.path.abspath(pnml_file)}")
-        return None
 
-    places = set()
-    transitions = set()
-    arcs_pt = set()
-    arcs_tp = set()
-    initial_marking = set()
-    all_arc_tuples = []
-
-    try:
-        tree = ET.parse(pnml_file)
-        root = tree.getroot()
-
-        namespace = ''
-        if '}' in root.tag:
-            namespace = root.tag.split('}')[0].strip('{')
-        ns_map = {'pnml': namespace} if namespace else {}
-
-        def find_all(elem, path):
-            if namespace:
-                parts = path.split('/')
-                new_parts = [f"pnml:{p}" if p and p != '.' else p for p in parts]
-                return elem.findall('/'.join(new_parts), ns_map)
-            else:
-                return elem.findall(path)
-
-        for place in find_all(root, './/place'):
-            place_id = place.get('id')
-            if place_id:
-                places.add(place_id)
-                marking_node = place.find(f".//{'pnml:' if namespace else ''}initialMarking/{'pnml:' if namespace else ''}text", ns_map)
-                if marking_node is not None and marking_node.text:
-                     try:
-                        if int(marking_node.text) > 0:
-                            initial_marking.add(place_id)
-                     except: pass
-
-        for trans in find_all(root, './/transition'):
-            trans_id = trans.get('id')
-            if trans_id:
-                transitions.add(trans_id)
-
-        for arc in find_all(root, './/arc'):
-            src = arc.get('source')
-            tgt = arc.get('target')
-            if src and tgt:
-                all_arc_tuples.append((src, tgt))
-
-        verify_consistency(places, transitions, all_arc_tuples)
-
-        for (src, tgt) in all_arc_tuples:
-            if src in places and tgt in transitions:
-                arcs_pt.add((src, tgt))
-            elif src in transitions and tgt in places:
-                arcs_tp.add((src, tgt))
-
-        return PetriNet(places, transitions, arcs_pt, arcs_tp, initial_marking)
-
-    except Exception as e:
-        print(f"Error parsing PNML: {e}")
-        return None
-
-# Block main để trống hoặc chỉ pass, để file này có thể import được
 if __name__ == "__main__":
-    pass
+    main()

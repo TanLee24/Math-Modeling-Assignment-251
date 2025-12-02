@@ -1,0 +1,161 @@
+﻿<pnml xmlns="http://www.pnml.org/version-2009/grammar/pnml">
+    <net id="15e73213-2a29-4795-ba5d-a58b44557d79" type="http://www.pnml.org/version-2009/grammar/ptnet">
+        <name>
+            <text>PetriNetExported</text>
+        </name>
+
+        <page id="06cefff3-d398-4c47-810d-fe4b26841cf1">
+
+            <!-- Places -->
+            <place id="624496a4-05dc-4490-a1d0-90ec00bd7124">
+                <name>
+                    <text>P1</text>
+                    <graphics>
+                        <offset x="0" y="35"/>
+                    </graphics>
+                </name>
+                <graphics>
+                    <position x="220" y="440"/>
+                </graphics>
+                <initialMarking>
+                    <text>1</text>
+                </initialMarking>
+            </place>
+
+            <place id="005c3d80-5e1e-4da5-9c70-56246c1d3ffa">
+                <name>
+                    <text>P2</text>
+                    <graphics>
+                        <offset x="0" y="35"/>
+                    </graphics>
+                </name>
+                <graphics>
+                    <position x="470" y="340"/>
+                </graphics>
+            </place>
+
+            <place id="39f90f28-b40e-41a2-8368-e4ffb212d7f2">
+                <name>
+                    <text>P3</text>
+                    <graphics>
+                        <offset x="0" y="35"/>
+                    </graphics>
+                </name>
+                <graphics>
+                    <position x="470" y="550"/>
+                </graphics>
+            </place>
+
+            <place id="3b5140c8-17b1-4327-84e4-b7b23db51e2d">
+                <name>
+                    <text>P4</text>
+                    <graphics>
+                        <offset x="0" y="35"/>
+                    </graphics>
+                </name>
+                <graphics>
+                    <position x="700" y="340"/>
+                </graphics>
+            </place>
+
+            <place id="6e8934a4-17e3-4205-b4f8-113332c94c51">
+                <name>
+                    <text>P5</text>
+                    <graphics>
+                        <offset x="0" y="35"/>
+                    </graphics>
+                </name>
+                <graphics>
+                    <position x="710" y="550"/>
+                </graphics>
+            </place>
+
+            <!-- Transitions -->
+            <transition id="15952ff7-319a-4230-bdd9-705b4404f8d0">
+                <name>
+                    <text>T1</text>
+                    <graphics>
+                        <offset x="0" y="35"/>
+                    </graphics>
+                </name>
+                <graphics>
+                    <position x="340" y="440"/>
+                </graphics>
+            </transition>
+
+            <transition id="ce423f3a-62ba-4094-8e65-98521ea88399">
+                <name>
+                    <text>T2</text>
+                </name>
+                <graphics>
+                    <position x="590" y="340"/>
+                </graphics>
+            </transition>
+
+            <transition id="e4e40472-a79c-4101-8022-4e0fbe4f36cd">
+                <name>
+                    <text>T3</text>
+                </name>
+                <graphics>
+                    <position x="600" y="550"/>
+                </graphics>
+            </transition>
+
+            <transition id="8b306608-1617-41fd-a527-7fd0c119e42f">
+                <name>
+                    <text>T4</text>
+                </name>
+                <graphics>
+                    <position x="830" y="440"/>
+                </graphics>
+            </transition>
+
+            <!-- Arcs -->
+            <arc id="9705fd28-8421-4831-98ca-cfb4a06842d8"
+                 source="624496a4-05dc-4490-a1d0-90ec00bd7124"
+                 target="15952ff7-319a-4230-bdd9-705b4404f8d0"/>
+
+            <arc id="70e03f46-2cf7-4433-acd3-836d704677fd"
+                 source="15952ff7-319a-4230-bdd9-705b4404f8d0"
+                 target="005c3d80-5e1e-4da5-9c70-56246c1d3ffa"/>
+
+            <arc id="879a9740-a2eb-4288-92aa-eb2e9a8650a6"
+                 source="15952ff7-319a-4230-bdd9-705b4404f8d0"
+                 target="39f90f28-b40e-41a2-8368-e4ffb212d7f2"/>
+
+            <arc id="9cbe6241-e06d-45be-900f-92d6b0d367a3"
+                 source="005c3d80-5e1e-4da5-9c70-56246c1d3ffa"
+                 target="ce423f3a-62ba-4094-8e65-98521ea88399"/>
+
+            <arc id="b69658b7-5f9c-4194-82cd-074ea40a24a6"
+                 source="ce423f3a-62ba-4094-8e65-98521ea88399"
+                 target="3b5140c8-17b1-4327-84e4-b7b23db51e2d"/>
+
+            <arc id="d110c8c5-d095-44ff-b0f0-34fb11b55acd"
+                 source="3b5140c8-17b1-4327-84e4-b7b23db51e2d"
+                 target="8b306608-1617-41fd-a527-7fd0c119e42f"/>
+
+            <arc id="19b98d5a-3774-4551-84cb-d1df5a226775"
+                 source="39f90f28-b40e-41a2-8368-e4ffb212d7f2"
+                 target="e4e40472-a79c-4101-8022-4e0fbe4f36cd"/>
+
+            <arc id="9f83e8c7-a792-477f-9db2-b87e10103970"
+                 source="e4e40472-a79c-4101-8022-4e0fbe4f36cd"
+                 target="6e8934a4-17e3-4205-b4f8-113332c94c51"/>
+
+            <arc id="08c68cf2-0c12-45ad-a394-b40e1e00b16d"
+                 source="6e8934a4-17e3-4205-b4f8-113332c94c51"
+                 target="8b306608-1617-41fd-a527-7fd0c119e42f"/>
+
+            <arc id="04ed505d-421b-4824-bbb1-bbaacd524fe9"
+                 source="8b306608-1617-41fd-a527-7fd0c119e42f"
+                 target="6e8934a4-17e3-4205-b4f8-113332c94c51">
+                <graphics>
+                    <position x="950" y="440"/>
+                    <position x="950" y="540"/>
+                </graphics>
+            </arc>
+
+        </page>
+    </net>
+</pnml>
