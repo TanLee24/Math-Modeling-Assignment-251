@@ -33,3 +33,16 @@ python3 --version
 ```sh
 sudo apt update
 ```
+
+## Install required Python libraries
+| Library                 | Purpose                       |
+| ----------------------- | ----------------------------- |
+| **pyeda**               | BDD symbolic model checking   |
+| **pulp**                | Linear programming solver     |
+| **numpy**               | Matrix & marking operations   |
+| **graphviz** (optional) | Visualization of BDD diagrams |
+
+Install them using pip:
+```sh
+pip3 install pyeda pulp numpy
+```
