@@ -60,7 +60,7 @@ def main():
     # ------------------------------------------------------
     # 6. Optimization: maximize c·M
     # ------------------------------------------------------
-    c = np.array([1, -2, 3, -1, 1, 2])
+    c = np.array([6, -2, 3, -1, 0, 5])
     print("\n--- Optimize c·M ---")
     max_mark, max_val = max_reachable_marking(
         pn.place_names, bdd, c
