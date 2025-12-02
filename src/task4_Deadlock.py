@@ -94,8 +94,8 @@ def candidate_from_ILP(model, x):
 def is_reachable(candidate, pn: PetriNet, bdd: BinaryDecisionDiagram):
     assign = {}
     for var in bdd.support:
-        name = var.name      # vd: "p3"
-        idx = int(name[1:])  # lấy số 3
+        name = var.name      # ex: "p3"
+        idx = int(name[1:])  # take the mum 3
         assign[var] = candidate[idx]
 
     return bdd.restrict(assign).is_one()
