@@ -56,9 +56,9 @@ def max_reachable_marking(
             else:
                 # Case 2: Variable is "Don't Care" (not in the point dictionary).
                 # Optimization Strategy:
-                # - If weight >= 0: Choose 1 to maximize the sum.
-                # - If weight < 0: Choose 0 to avoid reducing the sum.
-                bit = 1 if weight >= 0 else 0
+                # - If weight > 0: Choose 1 to maximize the sum.
+                # - If weight <= 0: Choose 0 to avoid reducing the sum.
+                bit = 1 if weight > 0 else 0
             
             # Construct the marking vector and accumulate the objective value.
             current_marking.append(bit)

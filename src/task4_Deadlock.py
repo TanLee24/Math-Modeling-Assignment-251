@@ -3,7 +3,7 @@ from typing import List, Optional
 from pyeda.inter import *
 from .task1_PetriNet import PetriNet
 
-def deadlock_reachable_marking(
+def deadlock_detecting(
     pn: PetriNet,
     bdd: BinaryDecisionDiagram,
 ) -> Optional[List[int]]:
