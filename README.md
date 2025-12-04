@@ -31,9 +31,23 @@ python3 --version
 
 # Install Dependencies (Ubuntu)
 ## Update package index
-
 ```sh
 sudo apt update
+```
+
+## Install VENV and required Python packages
+```sh
+sudo apt install python3-venv python3-full -y
+```
+
+## Create a virtual environment named '.venv'
+```sh
+python3 -m venv .venv
+```
+
+## Activate the virtual environment
+```sh
+source .venv/bin/activate
 ```
 
 ## Install required Python libraries
@@ -50,8 +64,13 @@ pip3 install pyeda pulp numpy
 
 ---
 
-# How to Run the Program
-Run the program:
+# How to Run the Program from now on
+## Activate venv
+```sh
+source .venv/bin/activate
+```
+
+## Run the program:
 ```sh
 python3 -m src.main
 ```
@@ -65,5 +84,5 @@ python3 -m src.main
 [0 1 0 0 0]
 [0 0 1 0 0]
 ...
-Total BFS reachable = 5
+Total BFS reachable = 6
 ```
