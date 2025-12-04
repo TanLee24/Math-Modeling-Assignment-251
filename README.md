@@ -1,6 +1,6 @@
-# Math-Modeling-Assignment-251 - Symbolic and Algebraic Reasoning in Petri Nets ⚛️
+# Math Modeling Assignment 251 - Symbolic and Algebraic Reasoning in Petri Nets ⚛️
 
-# 📘 Petri Net Analyzer – Installation & Usage Guide (Ubuntu)
+## 📘 Petri Net Analyzer – Installation & Usage Guide (Ubuntu)
 
 This project implements:
 - Petri Net parsing from PNML  
@@ -14,7 +14,7 @@ The project is written in **Python ≥ 3.10** and designed to run on **Ubuntu / 
 
 ---
 
-## 🔧 System Requirements
+### 🔧 System Requirements
 
 Make sure your system has:
 - Python 3.10+
@@ -29,28 +29,28 @@ python3 --version
 
 ---
 
-# Install Dependencies (Ubuntu)
-## Update package index
+## Install Dependencies (Ubuntu)
+### Update package index
 ```sh
 sudo apt update
 ```
 
-## Install VENV and required Python packages
+### Install VENV and required Python packages
 ```sh
 sudo apt install python3-venv python3-full -y
 ```
 
-## Create a virtual environment named '.venv'
+### Create a virtual environment named '.venv'
 ```sh
 python3 -m venv .venv
 ```
 
-## Activate the virtual environment
+### Activate the virtual environment
 ```sh
 source .venv/bin/activate
 ```
 
-## Install required Python libraries
+### Install required Python libraries
 | Library                 | Purpose                       |
 | ----------------------- | ----------------------------- |
 | **pyeda**               | BDD symbolic model checking   |
@@ -64,20 +64,20 @@ pip3 install pyeda pulp numpy
 
 ---
 
-# How to Run the Program After Installation
-## Activate venv
+## How to Run the Program After Installation
+### Activate venv
 ```sh
 source .venv/bin/activate
 ```
 
-## Run the program:
+### Run the program:
 ```sh
 python3 -m src.main
 ```
 
 ---
 
-# Example Program Output
+## Example Program Output
 ```text
 --- BFS Reachable Markings ---
 [1 0 0 0 0]
