@@ -1,5 +1,5 @@
-# Math-Modeling-Assignment-251
-Symbolic and Algebraic Reasoning in Petri Nets
+# Math-Modeling-Assignment-251 - Symbolic and Algebraic Reasoning in Petri Nets ⚛️
+
 # 📘 Petri Net Analyzer – Installation & Usage Guide (Ubuntu)
 
 This project implements:
@@ -64,7 +64,7 @@ pip3 install pyeda pulp numpy
 
 ---
 
-# How to Run the Program from now on
+# How to Run the Program After Installation
 ## Activate venv
 ```sh
 source .venv/bin/activate
