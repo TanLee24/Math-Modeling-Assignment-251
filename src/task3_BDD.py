@@ -99,5 +99,18 @@ def bdd_reachable(pn: PetriNet) -> Tuple[BinaryDecisionDiagram, int]:
 
         S |= nxt
 
+    
+    # Replace old satisfy_count() due to bug with don't-cares
+    count = 0
+    for i in range(2 ** num_places):
+        # Generate marking from binary representation
+        marking = tuple((i >> j) & 1 for j in range(num_places))
+        # Check if this marking is in the reachable set
+        constraint = ONE
+        for j in range(num_places):
+            constraint &= X[j] if marking[j] == 1 else ~X[j]
+        if not (S & constraint).is_zero():
+            count += 1
+    
     # Return reachable set BDD and number of satisfying assignments
-    return S, int(S.satisfy_count())
+    return S, count
