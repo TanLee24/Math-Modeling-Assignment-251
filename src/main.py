@@ -1,6 +1,6 @@
 from .task1_PetriNet import PetriNet
 from .task2_BFS import bfs_reachable
-from .task3_BDD import bdd_reachable
+from .task3_BDD import bdd_reachable, visualize_bdd
 from .task4_Deadlock import deadlock_detecting
 from .task5_Optimization import max_reachable_marking
 from pyeda.inter import *
@@ -61,6 +61,14 @@ def main():
         print(line)
     print("BDD reachable markings =", count)
 
+    # --- Drawing BDD ---
+    print("\n[+] Visualizing BDD...")
+    try:
+        visualize_bdd(bdd, "bdd_output")
+        print("Saved BDD image to 'bdd_output.png'")
+    except Exception as e:
+        print(f"Warning: Could not draw BDD. Make sure Graphviz is installed. Error: {e}")
+    
     # ------------------------------------------------------
     # 4. Deadlock detection
     # ------------------------------------------------------

@@ -11,6 +11,7 @@ from pyeda.inter import *
 import numpy as np
 from typing import Tuple
 from .task1_PetriNet import PetriNet
+from graphviz import Source
 
 # Constant BDDs
 ONE = expr2bdd(expr("1"))
@@ -36,7 +37,7 @@ def bdd_reachable(pn: PetriNet) -> Tuple[BinaryDecisionDiagram, int]:
         if pid and pid[0].isalpha() and all(c.isalnum() or c == "_" for c in pid):
             name = pid          # keep original name (e.g., p1, P2, ...)
         else:
-            name = f"p{i+1}"      # invalid name (UUID) → replace by safe p{i}
+            name = f"P{i+1}"      # invalid name (UUID) → replace by safe p{i}
 
         X.append(bddvar(name))              # current-state variable
         X_prime.append(bddvar(name + "_prime"))  # next-state variable
@@ -114,3 +115,16 @@ def bdd_reachable(pn: PetriNet) -> Tuple[BinaryDecisionDiagram, int]:
     
     # Return reachable set BDD and number of satisfying assignments
     return S, count
+
+
+def visualize_bdd(bdd, filename="bdd_reachable_set"):
+    """
+    Creating BDD image using graphviz library
+    """
+
+    print(f"Drawing BDD to {filename}.png ...")
+    dot_source = bdd.to_dot()
+    src = Source(dot_source)
+    src.render(filename, format='png', view=False)
+    
+    print("Done!")

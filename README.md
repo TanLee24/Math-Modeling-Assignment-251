@@ -34,6 +34,10 @@ python3 --version
 ```sh
 sudo apt update
 ```
+### Install graphviz to create BDD image
+```sh
+sudo apt install graphviz -y
+```
 
 ### Install VENV and required Python packages
 ```sh
