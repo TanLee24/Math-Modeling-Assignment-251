@@ -89,13 +89,30 @@ def candidate_from_ILP(model, x):
         return None
     return [int(pulp.value(x[p])) for p in x]
 
-
 # BDD checking reachables
 def is_reachable(candidate, pn: PetriNet, bdd: BinaryDecisionDiagram):
     assign = {}
     for var in bdd.support:
-        name = var.name      # ex: "p3"
-        idx = int(name[1:])  # take the mum 3
-        assign[var] = candidate[idx]
-
+        name = var.name
+        try:
+            num_str = "".join(filter(str.isdigit, name))
+            idx = int(num_str) - 1
+        except ValueError:
+            continue
+            
+        if 0 <= idx < len(candidate):
+            assign[var] = candidate[idx]
+    if not assign:
+        return False
+        
     return bdd.restrict(assign).is_one()
+
+
+# def is_reachable(candidate, pn: PetriNet, bdd: BinaryDecisionDiagram):
+#     assign = {}
+#     for var in bdd.support:
+#         name = var.name      # ex: "p3"
+#         idx = int(name[1:])  # take the mum 3
+#         assign[var] = candidate[idx]
+
+#     return bdd.restrict(assign).is_one()

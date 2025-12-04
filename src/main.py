@@ -28,7 +28,7 @@ def main():
     # ------------------------------------------------------
     # 1. Load Petri Net
     # ------------------------------------------------------
-    filename = "tests/test1.pnml" # Change model file here!!!
+    filename = "tests/test2.pnml" # Change model file here!!!
     print("Loading PNML:", filename)
 
     start = time.perf_counter()
@@ -87,3 +87,4 @@ def main():
 
 if __name__ == "__main__":
     main()
+
